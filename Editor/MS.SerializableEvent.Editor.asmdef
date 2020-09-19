@@ -1,0 +1,16 @@
+{
+    "name": "MS.SerializableEvent.Editor",
+    "references": [
+        "MS.SerializableEvent"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

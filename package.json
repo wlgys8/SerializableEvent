@@ -1,0 +1,9 @@
+{
+  "name": "com.ms.serializable.event",
+  "displayName": "Serializable Event",
+  "version": "0.0.1",
+  "description": "Serializable Event",
+  "keywords": [],
+  "dependencies": {
+  }
+}
