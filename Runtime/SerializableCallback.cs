@@ -169,14 +169,17 @@ namespace MS.Events{
                 return;
             }
             #if UNITY_EDITOR
-            if(!Application.isPlaying){
-                if(_callState == CallState.EditorAndRuntime){
+            if(_callState == CallState.EditorAndRuntime){
+                DoActualInvoke(args);
+            }else{
+                if(Application.isPlaying){
                     DoActualInvoke(args);
                 }
-                return;
             }
-            #endif
+            #else
             DoActualInvoke(args);
+            #endif
+            
         }
 
         private void DoActualInvoke(object[] args){
