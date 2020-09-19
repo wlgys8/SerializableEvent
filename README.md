@@ -19,6 +19,12 @@ Similar to `UnityEvent`, but with more features :
     - Color
     - Quaternion
     - Enum
+    
+![](https://raw.githubusercontent.com/wiki/wlgys8/SerializableEvent/.images/img2.jpeg)
+
+# Usage
+
+[Visit WIKI](https://github.com/wlgys8/SerializableEvent/wiki)
 
 # Benchmark
 
