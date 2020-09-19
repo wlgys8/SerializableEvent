@@ -22,7 +22,14 @@ Similar to `UnityEvent`, but with more features :
 
 # Benchmark
 
-TOOD
+add one persistent void call to UnityEvent & SerializableEvent and call invoke 10000 times.
+
+
+
+ * |SerializableEvent|UnityEvent
+---|---|---
+Cost|1.394ms|1.662ms
+
 
 # Extend Callback Arguements Support
 In consideration of IL2Cpp/AOT, you can only choose callbacks with ONE arguement or multiple arguements without ValueType by default.
@@ -42,5 +49,4 @@ public static void RegisterArguementsSupport(){
 }
 
 ```
-
 
