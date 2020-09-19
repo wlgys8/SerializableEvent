@@ -32,7 +32,7 @@ add one persistent void call to UnityEvent & SerializableEvent and call invoke 1
 
 
 
- * |SerializableEvent|UnityEvent
+ -- |SerializableEvent|UnityEvent
 ---|---|---
 Cost|1.394ms|1.662ms
 
