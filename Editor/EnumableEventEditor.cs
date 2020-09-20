@@ -39,6 +39,7 @@ namespace MS.Events.Editor{
                 }
             }
             height += addStatusButtonHeight;
+            height += 10;
             return height;
         }
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
@@ -61,9 +62,9 @@ namespace MS.Events.Editor{
             if(drawHeader){
                 //header
                 defaults.DrawHeaderBackground(new Rect(rect.x,y,rect.width,titleBarHeight));
-                x += 50;
+                x += indentSpace;
                 EditorGUI.LabelField(new Rect(x,y,rect.width - x,titleBarHeight),label);
-                x -= 50;
+                x -= indentSpace;
                 y += titleBarHeight;
             }
 
