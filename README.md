@@ -23,6 +23,21 @@ Similar to `UnityEvent`, but with more features :
     
 ![](https://raw.githubusercontent.com/wiki/wlgys8/SerializableEvent/.images/img2.jpeg)
 
+# Dependencies
+
+[FastReflection - .Net fast reflection for Unity](https://github.com/wlgys8/FastReflection)
+
+# Install
+
+add packages in \<Project>/manifest.json
+
+```json
+
+"com.ms.fastreflection":"https://github.com/wlgys8/FastReflection.git",
+"com.ms.serializable.event":"https://github.com/wlgys8/SerializableEvent.git"
+
+```
+
 # Usage
 
 [Visit WIKI](https://github.com/wlgys8/SerializableEvent/wiki)
