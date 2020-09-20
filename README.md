@@ -29,7 +29,7 @@ Similar to `UnityEvent`, but with more features :
 
 # Install
 
-add packages in \<Project>/manifest.json
+add packages in \<Project>/Packages/manifest.json
 
 ```json
 
