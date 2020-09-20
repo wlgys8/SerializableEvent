@@ -19,6 +19,7 @@ Similar to `UnityEvent`, but with more features :
     - Color
     - Quaternion
     - Enum
+- Support distinguish target component when there are mulpitle identical components in one GameObject.
     
 ![](https://raw.githubusercontent.com/wiki/wlgys8/SerializableEvent/.images/img2.jpeg)
 
