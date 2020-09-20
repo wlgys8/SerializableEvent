@@ -83,7 +83,15 @@ namespace MS.Events.Editor{
 
             y += height;
             var sourceRect = new Rect(rect.x,y,rect.width * 0.3f,height);
+            var identicalComponentIndex = CalculateIdenticalComponentIndex(target.objectReferenceValue);
+            if(identicalComponentIndex >= 0){
+                sourceRect.width -= 20;
+            }
             EditorGUI.PropertyField (sourceRect, target,GUIContent.none);
+            if(identicalComponentIndex >=0){
+                EditorGUI.LabelField(new Rect(sourceRect.xMax,sourceRect.y,20,sourceRect.height),$"[{identicalComponentIndex}]");
+                sourceRect.width += 20;
+            }
 
             var dynamicArguementSupport = IsDynamicArguementSupport(property);
             var dynamic = GetArguementMode(arguementMode.enumValueIndex) == ArguementMode.Dynamic;
@@ -184,7 +192,7 @@ namespace MS.Events.Editor{
                         methodInfo = m,
                         property = property
                     };
-                    string itemName = GetMethodItemName(group.target,m);
+                    string itemName = GetMethodItemName(group.target,m,group.identicalComponentIndex);
                     menu.AddItem(new GUIContent(itemName),false,OnFunctionSelected,context);
                 }
             }
@@ -232,18 +240,33 @@ namespace MS.Events.Editor{
                     };
                     result.Add(validMethods);
                 }
-                
+
                 var components = go.GetComponents<Component>();
+                var identicalComponentsDict = new Dictionary<System.Type,List<ValidMethods>>();
                 foreach(var comp in components){
                     var methods = GetValidMethodsFromType(comp.GetType());
+                    var targetType = comp.GetType();
                     var validMethods = new ValidMethods(){
-                        targetType = comp.GetType(),
+                        targetType = targetType,
                         methods = methods,
                         target = comp,
                     };
+                    if(!identicalComponentsDict.ContainsKey(targetType)){
+                        identicalComponentsDict[targetType] = new List<ValidMethods>();
+                    }
+                    identicalComponentsDict[targetType].Add(validMethods);
                     result.Add(validMethods);
                 }
 
+                foreach(var kv in identicalComponentsDict){
+                    if(kv.Value.Count > 1){
+                        var index = 0;
+                        foreach(var validMethods in kv.Value){
+                            validMethods.identicalComponentIndex = index;
+                            index++;
+                        }
+                    }
+                }
                 return result;
             }
             return new List<ValidMethods>();
@@ -298,8 +321,11 @@ namespace MS.Events.Editor{
         }
 
 
-        private static string GetMethodItemName(Object target, MethodInfo methodInfo){
+        private static string GetMethodItemName(Object target, MethodInfo methodInfo,int identicalComponentIndex = -1){
             var typeName = target.GetType().Name;
+            if(identicalComponentIndex >= 0){
+                typeName += ("[" + identicalComponentIndex + "]");
+            }
             string displayFuncName = methodInfo.Name;
             var ps = methodInfo.GetParameters();
             if(methodInfo.IsSpecialName && displayFuncName.StartsWith("set_") && ps.Length == 1){
@@ -322,12 +348,40 @@ namespace MS.Events.Editor{
             }
         }
 
+        private static int CalculateIdenticalComponentIndex(Object target){
+            if(target == null){
+                return -1;
+            }
+            if(target is Component comp){
+                var go = comp.gameObject;
+                var components = go.GetComponents<Component>();
+                var index = 0;
+                var totalIdenticalTypeCount = 0;
+                foreach(var c in components){
+                    if(c.GetType() == target.GetType()){
+                        if(c == target){
+                            index = totalIdenticalTypeCount;
+                        }
+                        totalIdenticalTypeCount ++;
+                    }
+                }
+                if(totalIdenticalTypeCount > 1){
+                    return index;
+                }else{
+                    return -1;
+                }
+            }
+
+            return -1;
+        }
+
 
         public class ValidMethods{
 
             public Object target;
             public System.Type targetType;
             public MethodInfo[] methods;
+            public int identicalComponentIndex = -1;
         }
 
         public class FunctionSelectContext{
