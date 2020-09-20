@@ -171,6 +171,12 @@ namespace MS.Events.Editor{
         private static void ShowCallbackSelector(Object target,SerializedProperty property){
             var validMethods = GetValidMethodList(target);
             GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("No Function"),false,OnFunctionSelected,new FunctionSelectContext(){
+                target = target,
+                methodInfo = null,
+                property = property
+            });
+            menu.AddSeparator("");
             foreach(var group in validMethods){
                 foreach(var m in group.methods){
                     var context = new FunctionSelectContext(){
@@ -196,12 +202,16 @@ namespace MS.Events.Editor{
         private static void OnFunctionSelected(object userData){
             var context = userData as FunctionSelectContext;
             var methodInfo = context.methodInfo;
-            var parameters = methodInfo.GetParameters();
-            string funcName = methodInfo.Name;
             var property = context.property;
             var callback = EditorHelper.GetTargetObjectOfProperty(property) as SerializableCallback;
-            callback.Reset(context.target,methodInfo);
-            property.serializedObject.UpdateIfRequiredOrScript();
+            if(methodInfo == null){
+                callback.Reset(context.target,null);
+            }else{
+                var parameters = methodInfo.GetParameters();
+                string funcName = methodInfo.Name;
+                callback.Reset(context.target,methodInfo);
+                property.serializedObject.UpdateIfRequiredOrScript();
+            }
         }
 
 
@@ -240,8 +250,8 @@ namespace MS.Events.Editor{
             if(m.IsGenericMethod){
                 return MethodInvalidReason.GenericMethodNotSupport;
             }
-            if(m.ReturnType != null && m.ReturnType != typeof(void)){
-                return MethodInvalidReason.ReturnTypeNotSupport;
+            if(m.Name.StartsWith("get_")){
+                return MethodInvalidReason.PropertyGetNotSupport;
             }
             var parameters = m.GetParameters();
             if(parameters.Length > 4){
@@ -315,12 +325,14 @@ namespace MS.Events.Editor{
         public enum MethodInvalidReason{
             None,
             GenericMethodNotSupport,
+            PropertyGetNotSupport,
             ReturnTypeNotSupport,
             TooManyArguements,
 
             RefArguementNotSupport,
             ArguementNotSerializable,
             AOTEnsureRequired,
+            
         }
 
     }
