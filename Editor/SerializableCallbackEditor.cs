@@ -222,6 +222,17 @@ namespace MS.Events.Editor{
             }
             var result = new List<ValidMethods>();
             if(target is GameObject go){
+
+                {
+                    var methods = GetValidMethodsFromType(go.GetType());
+                    var validMethods = new ValidMethods(){
+                        targetType = go.GetType(),
+                        methods = methods,
+                        target = go,
+                    };
+                    result.Add(validMethods);
+                }
+                
                 var components = go.GetComponents<Component>();
                 foreach(var comp in components){
                     var methods = GetValidMethodsFromType(comp.GetType());
@@ -232,6 +243,7 @@ namespace MS.Events.Editor{
                     };
                     result.Add(validMethods);
                 }
+
                 return result;
             }
             return new List<ValidMethods>();
@@ -249,6 +261,9 @@ namespace MS.Events.Editor{
         private static MethodInvalidReason ValidateMethod(MethodInfo m){
             if(m.IsGenericMethod){
                 return MethodInvalidReason.GenericMethodNotSupport;
+            }
+            if(m.GetCustomAttribute<System.ObsoleteAttribute>() != null){
+                return MethodInvalidReason.Obsolete;
             }
             if(m.Name.StartsWith("get_")){
                 return MethodInvalidReason.PropertyGetNotSupport;
@@ -332,6 +347,7 @@ namespace MS.Events.Editor{
             RefArguementNotSupport,
             ArguementNotSerializable,
             AOTEnsureRequired,
+            Obsolete
             
         }
 
