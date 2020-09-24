@@ -8,8 +8,9 @@ namespace MS.Events{
     [System.Serializable]
     public class SerializableCallbackGroup
     #if UNITY_EDITOR
-    :ISerializationCallbackReceiver{
+    :ISerializationCallbackReceiver
     #endif
+    {
 
         [SerializeField]
         private List<SerializableCallback> _callbacks;
