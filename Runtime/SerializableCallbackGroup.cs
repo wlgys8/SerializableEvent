@@ -45,6 +45,9 @@ namespace MS.Events{
             #if UNITY_EDITOR
             callback.constrainedDynamicArguementTypes = constrainedDynamicArguementTypes;
             #endif
+            if(_callbacks == null){
+                _callbacks = new List<SerializableCallback>();
+            }
             _callbacks.Add(callback);
         }
 
