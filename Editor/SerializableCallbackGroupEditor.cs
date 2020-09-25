@@ -22,8 +22,8 @@ namespace MS.Events.Editor{
                 return _states[property.propertyPath];
             }
             var serializedObject = property.serializedObject;
-            var callbacks = property.FindPropertyRelative("_callbacks");
-            var reorderableList = new ReorderableList(serializedObject,callbacks);
+            var callbacksSP = property.FindPropertyRelative("_callbacks");
+            var reorderableList = new ReorderableList(serializedObject,callbacksSP);
 
             reorderableList.drawHeaderCallback = (rect)=>{
                 var label = _states[property.propertyPath].label;
@@ -31,25 +31,22 @@ namespace MS.Events.Editor{
             };
 
             reorderableList.elementHeightCallback = (index)=>{
-                var item = callbacks.GetArrayElementAtIndex(index);
+                var item = callbacksSP.GetArrayElementAtIndex(index);
                 return EditorGUI.GetPropertyHeight(item) + 5;
             };
 
             reorderableList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused)=>{
-                var item = callbacks.GetArrayElementAtIndex(index);
+                var item = callbacksSP.GetArrayElementAtIndex(index);
                 EditorGUI.PropertyField(rect,item);
             };
             reorderableList.onAddCallback = (list)=>{
-                callbacks.InsertArrayElementAtIndex(callbacks.arraySize);
-                serializedObject.ApplyModifiedProperties();
-                var lastItem = callbacks.GetArrayElementAtIndex(callbacks.arraySize - 1);
-                var callback = EditorHelper.GetTargetObjectOfProperty(lastItem) as SerializableCallback;
-                callback.callState = CallState.RuntimeOnly;
-                callback.Reset(null,null);
+                var callbacks = EditorHelper.GetTargetObjectOfProperty(property) as SerializableCallbackGroup;
+                callbacks.AddCallback(null,null);
+                serializedObject.UpdateIfRequiredOrScript();
             } ;
 
             reorderableList.onRemoveCallback = (list)=>{
-                callbacks.DeleteArrayElementAtIndex(list.index);
+                callbacksSP.DeleteArrayElementAtIndex(list.index);
                 serializedObject.ApplyModifiedProperties();
             };
             var state = new State(){

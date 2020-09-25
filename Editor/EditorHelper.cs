@@ -83,6 +83,9 @@ namespace MS.Events.Editor{
                     obj = GetValue_Imp(obj, element);
                 }
             }
+            if(obj == null){
+                Debug.LogWarning($"can not find actual obj from SerializedProperty:{prop.propertyPath}");
+            }
             return obj;
         }
 

@@ -40,6 +40,13 @@ namespace MS.Events{
         }
         #endif
 
+        public void AddCallback(Object target,System.Reflection.MethodInfo methodInfo){
+            var callback = new SerializableCallback(target,methodInfo);
+            #if UNITY_EDITOR
+            callback.constrainedDynamicArguementTypes = constrainedDynamicArguementTypes;
+            #endif
+            _callbacks.Add(callback);
+        }
 
         public void Invoke(object[] args){
             if(_callbacks == null || _callbacks.Count == 0){
