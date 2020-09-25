@@ -27,7 +27,10 @@ namespace MS.Events.Editor{
                 }
             }
 
-            if (Object.ReferenceEquals(obj, null)) return;
+            if (Object.ReferenceEquals(obj, null)){
+                Debug.LogWarning("obj is null");
+                return;
+            };
 
             try
             {
@@ -49,10 +52,12 @@ namespace MS.Events.Editor{
                 else
                 {
                     var tp = obj.GetType();
-                    var field = tp.GetField(element, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    var field = GetFieldRecursively(tp,element);
                     if (field != null)
                     {
                        field.SetValue(obj, value);
+                    }else{
+                        Debug.LogWarning($"missing field {element} at type {tp}");
                     }
                     // DynamicUtil.SetValue(obj, element, value);
                 }
@@ -87,6 +92,18 @@ namespace MS.Events.Editor{
                 Debug.LogWarning($"can not find actual obj from SerializedProperty:{prop.propertyPath}");
             }
             return obj;
+        }
+
+        private static FieldInfo GetFieldRecursively(System.Type type,string fieldName){
+            var field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if(field != null){
+                return field;
+            }
+            if(type.BaseType != null){
+                return GetFieldRecursively(type.BaseType,fieldName);
+            }else{
+                return null;
+            }
         }
 
         private static object GetValue_Imp(object source, string name)

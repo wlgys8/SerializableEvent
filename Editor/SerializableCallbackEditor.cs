@@ -135,6 +135,9 @@ namespace MS.Events.Editor{
             if(callbackArguementTypes.Length == 0){
                 return false;
             }
+            if(constrainedDynamicArguementTypes == null){
+                return false;
+            }
             if(callbackArguementTypes.Length != constrainedDynamicArguementTypes.Length){
                 return false;
             }

@@ -18,9 +18,9 @@ namespace MS.Events{
     }
 
     [System.Serializable]
-    public class SerializableCallback
+    public class SerializableCallback:System.ICloneable
     #if UNITY_EDITOR
-    :ISerializationCallbackReceiver
+    ,ISerializationCallbackReceiver
     #endif
     {
 
@@ -36,10 +36,10 @@ namespace MS.Events{
         [SerializeField]
         private List<SerializableArguement> _arguements;
 
-        private ArguementsCache _arguementsCache;
-
         [SerializeField]
         private ArguementMode _arguementMode = ArguementMode.Static;
+
+        private ArguementsCache _arguementsCache;
 
         [System.NonSerialized]
         private BaseCachedCall _cachedCall;
@@ -108,8 +108,6 @@ namespace MS.Events{
             }
         }
 
-        private static readonly System.Type[] EMPTY_TYPES = new System.Type[0];
-
         public System.Type[] arguementTypes{
             get{
                 return arguementsCache.types;
@@ -140,6 +138,7 @@ namespace MS.Events{
             }
             var methodInfo = _target.GetType().GetMethod(_funcName,arguementsCache.types);
             if(methodInfo == null){
+                Debug.LogWarning($"{_target.GetType()}.{_funcName}: {arguementsCache.types.Length}");
                 return false;
             }
             return true;
@@ -211,6 +210,20 @@ namespace MS.Events{
         public void SetCachedValuesDirty(){
             arguementsCache.SetValuesDirty();
         }
+        public object Clone()
+        {
+            var clone = new SerializableCallback();
+            clone._target = _target;
+            clone._funcName = _funcName;
+            clone._arguementMode = _arguementMode;
+            clone._arguements = new List<SerializableArguement>();
+            if(_arguements != null){
+                foreach(var arg in _arguements){
+                    clone._arguements.Add(arg.Clone() as SerializableArguement);
+                }
+            }
+            return clone;
+        }
 
 #if UNITY_EDITOR
 
@@ -244,6 +257,9 @@ namespace MS.Events{
         public void OnAfterDeserialize()
         {
             _editorArguementsNamesDirty = true;
+            _arguementsCache = null;
+            _cachedCall = null;
+            _isCachedCallDirty = true;
         }
 #endif
         static SerializableCallback(){
@@ -268,6 +284,7 @@ namespace MS.Events{
         public static bool CheckMethodWithArguementSupportInAOT(System.Type[] arguementTypes){
             return CachedCallArguementsTypeRegister.IsCallSupport(arguementTypes);
         }
+
 
     }
 

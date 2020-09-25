@@ -6,44 +6,19 @@ namespace MS.Events{
 
 
     [System.Serializable]
-    public class SerializableCallbackGroup
+    public class SerializableCallbackGroup:System.ICloneable
     #if UNITY_EDITOR
-    :ISerializationCallbackReceiver
+    ,ISerializationCallbackReceiver
     #endif
     {
 
         [SerializeField]
         private List<SerializableCallback> _callbacks;
-    
-        #if UNITY_EDITOR
-        private bool _editorConstrainedDynamicArguementTypesDirty = true;
-        private System.Type[] _constrainedDynamicArguementTypes;
-        internal System.Type[] constrainedDynamicArguementTypes{
-            get{
-                return _constrainedDynamicArguementTypes;
-            }set{
-                _constrainedDynamicArguementTypes = value;
-                _editorConstrainedDynamicArguementTypesDirty = true;
-            }
-        }
-
-        public void UpdateEditorConstrainedDynamicArguementTypesIfRequired(){
-            if(!_editorConstrainedDynamicArguementTypesDirty){
-                return;
-            }
-            _editorConstrainedDynamicArguementTypesDirty = false;
-            if(_callbacks != null){
-                foreach(var callback in _callbacks){
-                    callback.constrainedDynamicArguementTypes = constrainedDynamicArguementTypes;
-                }
-            }
-        }
-        #endif
 
         public void AddCallback(Object target,System.Reflection.MethodInfo methodInfo){
             var callback = new SerializableCallback(target,methodInfo);
             #if UNITY_EDITOR
-            callback.constrainedDynamicArguementTypes = constrainedDynamicArguementTypes;
+            callback.constrainedDynamicArguementTypes = editorConstrainedDynamicArguementTypes;
             #endif
             if(_callbacks == null){
                 _callbacks = new List<SerializableCallback>();
@@ -60,7 +35,50 @@ namespace MS.Events{
             }
         }
 
+        public int count{
+            get{
+                if(_callbacks == null){
+                    return 0;
+                }
+                return _callbacks.Count;
+            }
+        }
+        public object Clone()
+        {
+            var clone = new SerializableCallbackGroup();
+            if(_callbacks != null){
+                clone._callbacks = new List<SerializableCallback>();
+                foreach(var c in _callbacks){
+                    clone._callbacks.Add(c.Clone() as SerializableCallback);
+                }
+            }
+            return clone;
+        }
+
+
         #if UNITY_EDITOR
+        private bool _editorConstrainedDynamicArguementTypesDirty = true;
+        private System.Type[] _constrainedDynamicArguementTypes;
+        internal System.Type[] editorConstrainedDynamicArguementTypes{
+            get{
+                return _constrainedDynamicArguementTypes;
+            }set{
+                _constrainedDynamicArguementTypes = value;
+                _editorConstrainedDynamicArguementTypesDirty = true;
+            }
+        }
+
+        public void UpdateEditorConstrainedDynamicArguementTypesIfRequired(){
+            if(!_editorConstrainedDynamicArguementTypesDirty){
+                return;
+            }
+            _editorConstrainedDynamicArguementTypesDirty = false;
+            if(_callbacks != null){
+                foreach(var callback in _callbacks){
+                    callback.constrainedDynamicArguementTypes = editorConstrainedDynamicArguementTypes;
+                }
+            }
+        }
         public void OnBeforeSerialize()
         {
         }
@@ -69,6 +87,7 @@ namespace MS.Events{
         {
             _editorConstrainedDynamicArguementTypesDirty = true;
         }
+
         #endif
     }
 }

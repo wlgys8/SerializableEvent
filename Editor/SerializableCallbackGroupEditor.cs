@@ -28,6 +28,7 @@ namespace MS.Events.Editor{
             reorderableList.drawHeaderCallback = (rect)=>{
                 var label = _states[property.propertyPath].label;
                 EditorGUI.LabelField(rect,label);
+                this.DrawSettingButton(rect,property);
             };
 
             reorderableList.elementHeightCallback = (index)=>{
@@ -54,6 +55,50 @@ namespace MS.Events.Editor{
             };
             _states.Add(property.propertyPath,state);
             return state;
+        }
+
+        private void DrawSettingButton(Rect headerRect,SerializedProperty property){
+            var rect = new Rect(headerRect.xMax - 20,headerRect.y,15,headerRect.height);
+            var icon = EditorGUIUtility.Load("_Popup") as Texture;
+            if(GUI.Button(rect,new GUIContent(icon),GUIStyle.none)){
+                ShowSettingContextMenu(property);
+            }
+        }
+
+        private void ShowSettingContextMenu(SerializedProperty property){
+            var menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Copy"),false,OnSettingMenuClick,new SettingContext(){
+                commandName = "Copy",
+                property = property
+            });
+            if(_callbacksGroupCopied != null){
+                menu.AddItem(new GUIContent("Paste"),false,OnSettingMenuClick,new SettingContext(){
+                    commandName = "Paste",
+                    property = property
+                });
+            }else{
+                menu.AddDisabledItem(new GUIContent("Paste"));
+            }
+            menu.ShowAsContext();
+        }
+
+        private static SerializableCallbackGroup _callbacksGroupCopied;
+        private void OnSettingMenuClick(object userData){
+            var context = (SettingContext)userData;
+            if(context.commandName == "Copy"){
+                var callbacksGroup = EditorHelper.GetTargetObjectOfProperty(context.property) as SerializableCallbackGroup;
+                _callbacksGroupCopied = callbacksGroup.Clone() as SerializableCallbackGroup;
+            }else if(context.commandName == "Paste"){
+                if(_callbacksGroupCopied != null){
+                    EditorHelper.SetTargetObjectOfProperty(context.property,_callbacksGroupCopied.Clone());
+                    context.property.serializedObject.UpdateIfRequiredOrScript();
+                }
+            }
+        }
+
+        private struct SettingContext{
+            public string commandName;
+            public SerializedProperty property;
         }
 
 

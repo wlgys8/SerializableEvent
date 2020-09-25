@@ -23,7 +23,7 @@ namespace MS.Events{
     }
 
     [System.Serializable]
-    public class SerializableArguement:ISerializationCallbackReceiver{
+    public class SerializableArguement:ISerializationCallbackReceiver,System.ICloneable{
 
         [SerializeField]
         private ArguementSerializeType _serializeType;
@@ -329,6 +329,10 @@ namespace MS.Events{
  
         }
 
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
 
         internal class ArgTypeMeta{
             public ArguementSerializeType serializeType;
@@ -510,7 +514,6 @@ namespace MS.Events{
             }
             return _typeToSerializeType.ContainsKey(type);
         }
-
 
     }
 }

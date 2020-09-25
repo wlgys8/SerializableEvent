@@ -5,7 +5,7 @@ using UnityEngine.Events;
 namespace MS.Events{
 
     [System.Serializable]
-    public class SerializableEventBase{
+    public class SerializableEventBase:System.ICloneable{
 
         [SerializeField]
         private SerializableCallbackGroup _persistentCalls;
@@ -16,10 +16,20 @@ namespace MS.Events{
             }
         }
 
-        #if UNITY_EDITOR
+        public virtual object Clone()
+        {
+            var clone = this.MemberwiseClone() as SerializableEventBase;
+            if(_persistentCalls != null){
+                clone._persistentCalls = _persistentCalls.Clone() as SerializableCallbackGroup;
+            }
+            return clone;
+        }
+
+
+#if UNITY_EDITOR
         internal System.Type[] constrainedDynamicArguementTypes{
             set{
-                _persistentCalls.constrainedDynamicArguementTypes = value;
+                _persistentCalls.editorConstrainedDynamicArguementTypes = value;
             }
         }
         #endif
@@ -71,6 +81,15 @@ namespace MS.Events{
             _runtimeCalls.Remove(listener);
         }
 
+        public override object Clone()
+        {
+            var clone = base.Clone() as SerializableEvent;
+            clone._runtimeCalls = new List<UnityAction>();
+            foreach(var call in _runtimeCalls){
+                clone._runtimeCalls.Add(call);
+            }
+            return clone;
+        }
 
     }
 
@@ -119,6 +138,16 @@ namespace MS.Events{
         public void RemoveListener(UnityAction<T0> listener){
             _runtimeCalls.Remove(listener);
         }
+
+        public override object Clone()
+        {
+            var clone = base.Clone() as SerializableEvent<T0>;
+            clone._runtimeCalls = new List<UnityAction<T0>>();
+            foreach(var call in _runtimeCalls){
+                clone._runtimeCalls.Add(call);
+            }
+            return clone;
+        }
     }
 
 
@@ -166,6 +195,15 @@ namespace MS.Events{
         /// <param name="listener"></param>
         public void RemoveListener(UnityAction<T0,T1> listener){
             _runtimeCalls.Remove(listener);
+        }
+        public override object Clone()
+        {
+            var clone = base.Clone() as SerializableEvent<T0,T1>;
+            clone._runtimeCalls = new List<UnityAction<T0,T1>>();
+            foreach(var call in _runtimeCalls){
+                clone._runtimeCalls.Add(call);
+            }
+            return clone;
         }
     }
 
@@ -216,6 +254,16 @@ namespace MS.Events{
         public void RemoveListener(UnityAction<T0,T1,T2> listener){
             _runtimeCalls.Remove(listener);
         }
+
+        public override object Clone()
+        {
+            var clone = base.Clone() as SerializableEvent<T0,T1,T2>;
+            clone._runtimeCalls = new List<UnityAction<T0,T1,T2>>();
+            foreach(var call in _runtimeCalls){
+                clone._runtimeCalls.Add(call);
+            }
+            return clone;
+        }
     }
 
 
@@ -265,6 +313,16 @@ namespace MS.Events{
         /// <param name="listener"></param>
         public void RemoveListener(UnityAction<T0,T1,T2,T3> listener){
             _runtimeCalls.Remove(listener);
+        }
+
+        public override object Clone()
+        {
+            var clone = base.Clone() as SerializableEvent<T0,T1,T2,T3>;
+            clone._runtimeCalls = new List<UnityAction<T0,T1,T2,T3>>();
+            foreach(var call in _runtimeCalls){
+                clone._runtimeCalls.Add(call);
+            }
+            return clone;
         }
     }
 }
