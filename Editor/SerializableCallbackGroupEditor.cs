@@ -57,12 +57,33 @@ namespace MS.Events.Editor{
             return state;
         }
 
+        public struct CustomMenuItem{
+            public string menuName;
+            public GenericMenu.MenuFunction2 action;
+            public object userData;
+        }
+
+        static Dictionary<string,CustomMenuItem> _customMenuItems = new Dictionary<string, CustomMenuItem>();
+        private static  HashSet<string> _builtinMenuNames = new HashSet<string>{"Copy","Paste"};
+        static internal void AddCustomGenericContextMenuItem(CustomMenuItem item){
+            if(_builtinMenuNames.Contains(item.menuName)){
+                Debug.LogWarning("Can not use builtin menuName:" + item.menuName);
+                return;
+            }
+            _customMenuItems.Add(item.menuName,item);
+        }
+
+        private static void ClearCustomGenericContextMenuItem(){
+            _customMenuItems.Clear();
+        }
+
         private void DrawSettingButton(Rect headerRect,SerializedProperty property){
             var rect = new Rect(headerRect.xMax - 20,headerRect.y,15,headerRect.height);
             var icon = EditorGUIUtility.Load("_Popup") as Texture;
             if(GUI.Button(rect,new GUIContent(icon),GUIStyle.none)){
                 ShowSettingContextMenu(property);
             }
+            ClearCustomGenericContextMenuItem();
         }
 
         private void ShowSettingContextMenu(SerializedProperty property){
@@ -78,6 +99,10 @@ namespace MS.Events.Editor{
                 });
             }else{
                 menu.AddDisabledItem(new GUIContent("Paste"));
+            }
+
+            foreach(var kv in _customMenuItems){
+                menu.AddItem(new GUIContent(kv.Key),false,kv.Value.action,kv.Value.userData);
             }
             menu.ShowAsContext();
         }
@@ -99,6 +124,7 @@ namespace MS.Events.Editor{
         private struct SettingContext{
             public string commandName;
             public SerializedProperty property;
+
         }
 
 

@@ -61,9 +61,9 @@ namespace MS.Events.Editor{
             }
             if(drawHeader){
                 //header
-                defaults.DrawHeaderBackground(new Rect(rect.x,y,rect.width,titleBarHeight));
+                defaults.DrawHeaderBackground(new Rect(rect.x,y,width,titleBarHeight));
                 x += indentSpace;
-                EditorGUI.LabelField(new Rect(x,y,rect.width - x,titleBarHeight),label);
+                EditorGUI.LabelField(new Rect(x,y,width - x,titleBarHeight),label);
                 x -= indentSpace;
                 y += titleBarHeight;
             }
@@ -86,11 +86,15 @@ namespace MS.Events.Editor{
                     var enumValue = enumValues.GetValue(enumValueIndex);
                     var value = values.GetArrayElementAtIndex(i);
                     var height = EditorGUI.GetPropertyHeight(value);
+                    SerializableCallbackGroupEditor.AddCustomGenericContextMenuItem(new SerializableCallbackGroupEditor.CustomMenuItem(){
+                        menuName = "Delete",
+                        action = OnDeleteAction,
+                        userData = new GenericMenuDeleteContext(){
+                            property = property,
+                            enumValue = enumValue,
+                        },
+                    });
                     EditorGUI.PropertyField(new Rect(x,y,width,height),value,new GUIContent(enumValue.ToString()),true);
-                    if(GUI.Button(new Rect(rect.xMax - 20,y,20,18),"X",EditorStyles.label)){
-                        this.RemoveByEnum(enumValue,property);
-                        EditorGUIUtility.ExitGUI();
-                    }
                     y += height;
                 }
             }
@@ -98,6 +102,16 @@ namespace MS.Events.Editor{
             if(GUI.Button(new Rect(x + width/2 - 100,y,200,addStatusButtonHeight),"Add EventType")){
                 ShowAddMenu(property);
             }
+        }
+
+        private void OnDeleteAction(object userData){
+            GenericMenuDeleteContext ctx = (GenericMenuDeleteContext)userData;
+            this.RemoveByEnum(ctx.enumValue,ctx.property);
+        }
+
+        private struct GenericMenuDeleteContext{
+            public SerializedProperty property;
+            public object enumValue;
 
         }
 
