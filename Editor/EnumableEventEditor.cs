@@ -124,13 +124,16 @@ namespace MS.Events.Editor{
         }
 
 
-        private HashSet<object> CreateExistsEnumIndexes(SerializedProperty property){
+        private HashSet<object> CreateExistsEnumValues(SerializedProperty property,System.Array enumValues){
             var keys = property.FindPropertyRelative("_enums");
             var set = new HashSet<object>();
             if(keys != null){
                 for(var i = 0; i < keys.arraySize;i++){
                     var index = keys.GetArrayElementAtIndex(i).enumValueIndex;
-                    set.Add(index);
+                    var enumValue = enumValues.GetValue(index);
+                    if(!set.Contains(enumValue)){
+                        set.Add(enumValue);
+                    }
                 }
             }
             return set;
@@ -140,10 +143,10 @@ namespace MS.Events.Editor{
             var menu = new GenericMenu();
             var enumType = GetDerivedGenericEnumType(this.fieldInfo.FieldType);
             var enumValues = System.Enum.GetValues(enumType);
-            var existsEnumIndexes = CreateExistsEnumIndexes(property);
+            var existsEnumValues = CreateExistsEnumValues(property,enumValues);
             for(var i = 0; i < enumValues.Length; i ++){
                 var enumValue = (System.Enum)enumValues.GetValue(i);
-                if(existsEnumIndexes.Contains(i)){
+                if(existsEnumValues.Contains(enumValue)){
                     menu.AddDisabledItem(new GUIContent(enumValue.ToString()),false);
                 }else{
                     menu.AddItem(new GUIContent(enumValue.ToString()),false,OnAddItemSelected,new ItemAddContext(){
