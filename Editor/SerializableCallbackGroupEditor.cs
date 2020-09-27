@@ -130,6 +130,7 @@ namespace MS.Events.Editor{
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label){
             var state = GetState(property);
+            state.label = label;
             return state.list.GetHeight();
         }
 
@@ -137,9 +138,7 @@ namespace MS.Events.Editor{
             var callbackGroup = EditorHelper.GetTargetObjectOfProperty(property) as SerializableCallbackGroup;
             callbackGroup.UpdateEditorConstrainedDynamicArguementTypesIfRequired();
             var state = GetState(property);
-            if(state.label == null){
-                state.label = new GUIContent(label);
-            }
+            state.label = label;
             state.list.DoList(rect);
         }
     }
