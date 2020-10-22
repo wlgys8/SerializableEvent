@@ -217,6 +217,7 @@ namespace MS.Events{
             clone._funcName = _funcName;
             clone._arguementMode = _arguementMode;
             clone._arguements = new List<SerializableArguement>();
+            clone._callState = _callState;
             if(_arguements != null){
                 foreach(var arg in _arguements){
                     clone._arguements.Add(arg.Clone() as SerializableArguement);
