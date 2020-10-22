@@ -282,8 +282,12 @@ namespace MS.Events{
             CachedCallArguementsTypeRegister.EnsureCall<Quaternion>();
         }
 
-        public static bool CheckMethodWithArguementSupportInAOT(System.Type[] arguementTypes){
-            return CachedCallArguementsTypeRegister.IsCallSupport(arguementTypes);
+        public static bool CheckMethodWithArguementSupportInAOT(System.Type[] arguementTypes,System.Type returnType = null){
+            if(returnType == null || returnType == typeof(void)){
+                return CachedCallArguementsTypeRegister.IsCallSupport(arguementTypes);
+            }else{
+                return CachedCallArguementsTypeRegister.IsFuncSupport(returnType,arguementTypes);
+            }
         }
 
 

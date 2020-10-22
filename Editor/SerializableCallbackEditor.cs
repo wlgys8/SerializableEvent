@@ -309,7 +309,7 @@ namespace MS.Events.Editor{
                 }
                 types[idx ++] = p.ParameterType;
             }
-            if(!SerializableCallback.CheckMethodWithArguementSupportInAOT(types)){
+            if(!SerializableCallback.CheckMethodWithArguementSupportInAOT(types,m.ReturnType)){
                 return MethodInvalidReason.AOTEnsureRequired;
             }
             return MethodInvalidReason.None;
